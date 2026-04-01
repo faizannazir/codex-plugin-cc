@@ -187,6 +187,37 @@ test("pair command sets up a tech-lead/implementer collaborative session", () =>
   assert.match(source, /Do not make further code changes on your own/i);
 });
 
+test("pair command frontmatter uses fork context and exposes read tools for planning", () => {
+  const source = read("commands/pair.md");
+  assert.match(source, /^context:\s*fork/m);
+  assert.match(source, /allowed-tools:.*\bRead\b/);
+  assert.match(source, /allowed-tools:.*\bGlob\b/);
+  assert.match(source, /allowed-tools:.*\bGrep\b/);
+  assert.match(source, /allowed-tools:.*Bash\(git:\*\)/);
+  assert.match(source, /allowed-tools:.*AskUserQuestion/);
+});
+
+test("pair command stops before delegation when --discuss-only is requested", () => {
+  const source = read("commands/pair.md");
+  assert.match(source, /--discuss-only.*\n.*Stop here/is);
+  assert.match(source, /Do not delegate to Codex or make any file changes/i);
+});
+
+test("pair command output is Codex verbatim and not paraphrased", () => {
+  const source = read("commands/pair.md");
+  assert.match(source, /The final user-visible response must be Codex's output verbatim/i);
+  assert.match(source, /Do not paraphrase, summarize, rewrite, or add commentary/i);
+});
+
+test("README documents the pair command with discuss-only and typical flow", () => {
+  const readme = fs.readFileSync(path.join(ROOT, "README.md"), "utf8");
+  assert.match(readme, /### `\/codex:pair`/);
+  assert.match(readme, /--discuss-only/);
+  assert.match(readme, /pair programming/i);
+  assert.match(readme, /Pair Program Through a Feature/i);
+  assert.match(readme, /\/codex:pair --discuss-only/);
+});
+
 test("result and cancel commands are exposed as deterministic runtime entrypoints", () => {
   const result = read("commands/result.md");
   const cancel = read("commands/cancel.md");
