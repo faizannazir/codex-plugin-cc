@@ -75,6 +75,7 @@ test("continue is not exposed as a user-facing command", () => {
   assert.deepEqual(commandFiles, [
     "adversarial-review.md",
     "cancel.md",
+    "pair.md",
     "rescue.md",
     "result.md",
     "review.md",
@@ -157,6 +158,33 @@ test("rescue command absorbs continue semantics", () => {
   assert.match(readme, /### `\/codex:status`/);
   assert.match(readme, /### `\/codex:result`/);
   assert.match(readme, /### `\/codex:cancel`/);
+});
+
+test("pair command sets up a tech-lead/implementer collaborative session", () => {
+  const source = read("commands/pair.md");
+  assert.match(source, /AskUserQuestion/);
+  assert.match(source, /\bBash\(/);
+  assert.match(source, /--discuss-only/);
+  assert.match(source, /codex:codex-rescue/);
+  assert.match(source, /--write/);
+  assert.match(source, /--background\|--wait/);
+  assert.match(source, /--resume\|--fresh/);
+  assert.match(source, /--model <model\|spark>/);
+  assert.match(source, /--effort <none\|minimal\|low\|medium\|high\|xhigh>/);
+  assert.match(source, /task-resume-candidate --json/);
+  assert.match(source, /Continue current Codex thread/);
+  assert.match(source, /Start a new Codex thread/);
+  assert.match(source, /senior developer/i);
+  assert.match(source, /tech lead/i);
+  assert.match(source, /implementer/i);
+  assert.match(source, /Phase 1/i);
+  assert.match(source, /Phase 2/i);
+  assert.match(source, /Phase 3/i);
+  assert.match(source, /step-by-step plan/i);
+  assert.match(source, /Leave `--effort` unset unless the user explicitly asked for a specific reasoning effort/i);
+  assert.match(source, /map it to `gpt-5\.3-codex-spark`/i);
+  assert.match(source, /If the helper reports that Codex is missing or unauthenticated/i);
+  assert.match(source, /Do not make further code changes on your own/i);
 });
 
 test("result and cancel commands are exposed as deterministic runtime entrypoints", () => {

@@ -12,6 +12,7 @@ they already have.
 - `/codex:review` for a normal read-only Codex review
 - `/codex:adversarial-review` for a steerable challenge review
 - `/codex:rescue`, `/codex:status`, `/codex:result`, and `/codex:cancel` to delegate work and manage background jobs
+- `/codex:pair` to work side-by-side with Codex like two developers — Claude plans and reviews, Codex implements
 
 ## Requirements
 
@@ -162,6 +163,41 @@ Ask Codex to redesign the database connection to be more resilient.
 - if you say `spark`, the plugin maps that to `gpt-5.3-codex-spark`
 - follow-up rescue requests can continue the latest Codex task in the repo
 
+### `/codex:pair`
+
+Starts a collaborative pair programming session where Claude and Codex work together like two developers: Claude acts as the senior developer who plans, oversees, and reviews; Codex acts as the implementer who writes the code.
+
+The session runs in three phases:
+
+1. **Planning (Claude as tech lead):** Claude reads the relevant code, thinks through the approach, and presents a step-by-step plan with design notes and risks before any code is written.
+2. **Implementation (Codex as implementer):** Claude hands a structured brief to Codex, which executes the plan with write access to the workspace.
+3. **Review (Claude as tech lead):** Claude reviews what Codex produced, flags gaps or follow-up work, and suggests next steps.
+
+Use it when you want:
+
+- a structured, discussed approach before diving into implementation
+- Claude to act as a thoughtful reviewer throughout the task
+- a natural back-and-forth between planning and building, like pairing with a colleague
+
+It supports `--background`, `--wait`, `--resume`, `--fresh`, `--model`, and `--effort`. Add `--discuss-only` to get the plan without delegating to Codex.
+
+Examples:
+
+```bash
+/codex:pair add pagination to the user list endpoint
+/codex:pair --discuss-only redesign the retry logic in the queue worker
+/codex:pair --model gpt-5.4-mini --effort medium refactor the auth middleware
+/codex:pair --background implement the full feature described in issue #42
+/codex:pair --resume apply the suggested follow-up from the last pair session
+```
+
+**Notes:**
+
+- if you do not pass `--model` or `--effort`, Codex chooses its own defaults.
+- if you say `spark`, the plugin maps that to `gpt-5.3-codex-spark`
+- use `--discuss-only` when you want a reviewed plan before committing to implementation
+- follow-up pair requests can continue the latest Codex task in the repo
+
 ### `/codex:status`
 
 Shows running and recent Codex jobs for the current repository.
@@ -247,6 +283,26 @@ Then check in with:
 ```bash
 /codex:status
 /codex:result
+```
+
+### Pair Program Through a Feature
+
+Discuss the approach first, then implement:
+
+```bash
+/codex:pair --discuss-only add rate limiting to the API handler
+```
+
+Once you are happy with the plan, implement it:
+
+```bash
+/codex:pair add rate limiting to the API handler
+```
+
+Or do both in one shot — Claude will present the plan and immediately hand it to Codex:
+
+```bash
+/codex:pair refactor the database connection pool to be more resilient
 ```
 
 ## Codex Integration
